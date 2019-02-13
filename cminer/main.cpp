@@ -1,18 +1,18 @@
 /*
-    This file is part of ethminer.
+    This file is part of cminer.
 
-    ethminer is free software: you can redistribute it and/or modify
+    cminer is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    ethminer is distributed in the hope that it will be useful,
+    cminer is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with ethminer.  If not, see <http://www.gnu.org/licenses/>.
+    along with cminer.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <CLI/CLI.hpp>
@@ -68,7 +68,7 @@ struct MiningChannel : public LogChannel
 #define minelog clog(MiningChannel)
 
 #if ETH_DBUS
-#include <ethminer/DBusInt.h>
+#include <cminer/DBusInt.h>
 #endif
 
 class MinerCLI
@@ -757,12 +757,12 @@ public:
 
     void help()
     {
-        cout << "Ethminer - GPU ethash miner" << endl
-             << "minimal usage : ethminer [DEVICES_TYPE] [OPTIONS] -P... [-P...]" << endl
+        cout << "cminer - GPU ethash miner" << endl
+             << "minimal usage : cminer [DEVICES_TYPE] [OPTIONS] -P... [-P...]" << endl
              << endl
              << "Devices type options :" << endl
              << endl
-             << "    By default ethminer will try to use all devices types" << endl
+             << "    By default cminer will try to use all devices types" << endl
              << "    it can detect. Optionally you can limit this behavior" << endl
              << "    setting either of the following options" << endl
 #if ETH_ETHASHCL
@@ -783,7 +783,7 @@ public:
              << endl
              << "                        For an explication and some samples about" << endl
              << "                        how to fill in this value please use" << endl
-             << "                        ethminer --help-ext con" << endl
+             << "                        cminer --help-ext con" << endl
              << endl
 
              << "Common Options :" << endl
@@ -983,7 +983,7 @@ public:
                  << "                        Set number of reconnection retries to same pool"
                  << endl
                  << "    --failover-timeout  INT[0 .. ] Default not set" << endl
-                 << "                        Sets the number of minutes ethminer can stay" << endl
+                 << "                        Sets the number of minutes cminer can stay" << endl
                  << "                        connected to a fail-over pool before trying to" << endl
                  << "                        reconnect to the primary (the first) connection."
                  << endl
@@ -1002,10 +1002,10 @@ public:
                  << "                        0 No monitoring" << endl
                  << "                        1 Monitor temperature and fan percentage" << endl
                  << "                        2 As 1 plus monitor power drain" << endl
-                 << "    --exit              FLAG Stop ethminer whenever an error is encountered"
+                 << "    --exit              FLAG Stop cminer whenever an error is encountered"
                  << endl
                  << "    --ergodicity        INT[0 .. 2] Default = 0" << endl
-                 << "                        Sets how ethminer chooses the nonces segments to"
+                 << "                        Sets how cminer chooses the nonces segments to"
                  << endl
                  << "                        search on." << endl
                  << "                        0 A search segment is picked at startup" << endl
@@ -1165,16 +1165,16 @@ public:
                  << "    You can add as many -P arguments as you want. Every -P specification"
                  << endl
                  << "    after the first one behaves as fail-over connection. When also the" << endl
-                 << "    the fail-over disconnects ethminer passes to the next connection" << endl
+                 << "    the fail-over disconnects cminer passes to the next connection" << endl
                  << "    available and so on till the list is exhausted. At that moment" << endl
-                 << "    ethminer restarts the connection cycle from the first one." << endl
+                 << "    cminer restarts the connection cycle from the first one." << endl
                  << "    An exception to this behavior is ruled by the --failover-timeout" << endl
-                 << "    command line argument. See 'ethminer -H misc' for details." << endl
+                 << "    command line argument. See 'cminer -H misc' for details." << endl
                  << endl
                  << "    The special notation '-P exit' stops the failover loop." << endl
-                 << "    When ethminer reaches this kind of connection it simply quits." << endl
+                 << "    When cminer reaches this kind of connection it simply quits." << endl
                  << endl
-                 << "    When using stratum mode ethminer tries to auto-detect the correct" << endl
+                 << "    When using stratum mode cminer tries to auto-detect the correct" << endl
                  << "    flavour provided by the pool. Should be fine in 99% of the cases." << endl
                  << "    Nevertheless you might want to fine tune the stratum flavour by" << endl
                  << "    any of of the following valid schemes :" << endl
@@ -1310,14 +1310,14 @@ int main(int argc, char** argv)
     auto* bi = cminer_get_buildinfo();
     cout << endl
          << endl
-         << "ethminer " << bi->project_version << endl
+         << "cminer " << bi->project_version << endl
          << "Build: " << bi->system_name << "/" << bi->build_type << "/" << bi->compiler_id << endl
          << endl;
 
     if (argc < 2)
     {
         cerr << "No arguments specified. " << endl
-             << "Try 'ethminer --help' to get a list of arguments." << endl
+             << "Try 'cminer --help' to get a list of arguments." << endl
              << endl;
         return 1;
     }
@@ -1370,7 +1370,7 @@ int main(int argc, char** argv)
         catch (std::invalid_argument& ex1)
         {
             cerr << "Error: " << ex1.what() << endl
-                 << "Try ethminer --help to get an explained list of arguments." << endl
+                 << "Try cminer --help to get an explained list of arguments." << endl
                  << endl;
             return 1;
         }
