@@ -90,6 +90,8 @@ endif()
 
 cable_add_buildinfo_library(PROJECT_NAME ${PROJECT_NAME})
 
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+
 add_subdirectory(libethash)
 add_subdirectory(libdevcore)
 add_subdirectory(libethcore)

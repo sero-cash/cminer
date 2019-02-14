@@ -122,7 +122,10 @@ unsigned CPUMiner::getNumDevices()
     return cpus;
 #elif defined(__APPLE__) || defined(__MACOSX)
 //#error "TODO: Function CPUMiner::getNumDevices() on MAXOSX not implemented"
-    return 1;
+    u_int64_t count= 0;
+    size_t length = sizeof(count);
+    sysctlbyname("hw.logicalcpu_max",&count,&length,NULL,0);
+    return count;
 #elif defined(__linux__)
     long cpus_available;
     cpus_available = sysconf(_SC_NPROCESSORS_ONLN);
