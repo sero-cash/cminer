@@ -122,21 +122,21 @@ inline epoch_context_full_ptr create_epoch_context_full(int epoch_number) noexce
 }
 
 
-result hash(const epoch_context& context, const hash256& header_hash, uint64_t nonce) noexcept;
+result hash(const epoch_context& context, const hash256& header_hash, uint64_t nonce, uint64_t height) noexcept;
 
-result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept;
+result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce, uint64_t height) noexcept;
 
 bool verify_final_hash(const hash256& header_hash, const hash256& mix_hash, uint64_t nonce,
-    const hash256& boundary) noexcept;
+    const hash256& boundary, uint64_t height) noexcept;
 
 bool verify(const epoch_context& context, const hash256& header_hash, const hash256& mix_hash,
-    uint64_t nonce, const hash256& boundary) noexcept;
+    uint64_t nonce, const hash256& boundary, uint64_t height) noexcept;
 
 search_result search_light(const epoch_context& context, const hash256& header_hash,
-    const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept;
+    const hash256& boundary, uint64_t start_nonce, size_t iterations, uint64_t height) noexcept;
 
 search_result search(const epoch_context_full& context, const hash256& header_hash,
-    const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept;
+    const hash256& boundary, uint64_t start_nonce, size_t iterations, uint64_t height) noexcept;
 
 
 /// Tries to find the epoch number matching the given seed hash.

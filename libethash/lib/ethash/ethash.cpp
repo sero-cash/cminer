@@ -256,7 +256,7 @@ namespace
 {
 using lookup_fn = hash1024 (*)(const epoch_context&, uint32_t);
 
-inline hash512 hash_seed(const hash256& header_hash, uint64_t nonce) noexcept
+inline hash512 hash_seed(const hash256& header_hash, uint64_t nonce, uint64_t height) noexcept
 {
     nonce = le::uint64(nonce);
     uint8_t init_data[sizeof(header_hash) + sizeof(nonce)];
@@ -265,11 +265,15 @@ inline hash512 hash_seed(const hash256& header_hash, uint64_t nonce) noexcept
 
     //return keccak512(init_data, sizeof(init_data));
     hash512 ret={0};
-    zero_hash_0(init_data,ret.bytes);
+    if(height<130000) {
+        zero_hash_0(init_data, ret.bytes);
+    } else {
+        zero_hash_2(init_data, ret.bytes);
+    }
     return ret;
 }
 
-inline hash256 hash_final(const hash512& seed, const hash256& mix_hash)
+inline hash256 hash_final(const hash512& seed, const hash256& mix_hash, uint64_t height)
 {
     uint8_t final_data[sizeof(seed) + sizeof(mix_hash)];
     std::memcpy(&final_data[0], seed.bytes, sizeof(seed));
@@ -277,7 +281,11 @@ inline hash256 hash_final(const hash512& seed, const hash256& mix_hash)
     //return keccak256(final_data, sizeof(final_data));
 
     hash256 ret={0};
-    zero_hash_1(final_data,ret.bytes);
+    if(height<130000) {
+        zero_hash_1(final_data, ret.bytes);
+    } else {
+        zero_hash_3(final_data, ret.bytes);
+    }
     return ret;
 }
 
@@ -312,14 +320,14 @@ inline hash256 hash_kernel(
 }
 }  // namespace
 
-result hash(const epoch_context& context, const hash256& header_hash, uint64_t nonce) noexcept
+result hash(const epoch_context& context, const hash256& header_hash, uint64_t nonce, uint64_t height) noexcept
 {
-    const hash512 seed = hash_seed(header_hash, nonce);
+    const hash512 seed = hash_seed(header_hash, nonce, height);
     const hash256 mix_hash = hash_kernel(context, seed, calculate_dataset_item_1024);
-    return {hash_final(seed, mix_hash), mix_hash};
+    return {hash_final(seed, mix_hash, height), mix_hash};
 }
 
-result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce) noexcept
+result hash(const epoch_context_full& context, const hash256& header_hash, uint64_t nonce, uint64_t height) noexcept
 {
     static const auto lazy_lookup = [](const epoch_context& context, uint32_t index) noexcept
     {
@@ -334,23 +342,23 @@ result hash(const epoch_context_full& context, const hash256& header_hash, uint6
         return item;
     };
 
-    const hash512 seed = hash_seed(header_hash, nonce);
+    const hash512 seed = hash_seed(header_hash, nonce, height);
     const hash256 mix_hash = hash_kernel(context, seed, lazy_lookup);
-    return {hash_final(seed, mix_hash), mix_hash};
+    return {hash_final(seed, mix_hash, height), mix_hash};
 }
 
 bool verify_final_hash(const hash256& header_hash, const hash256& mix_hash, uint64_t nonce,
-    const hash256& boundary) noexcept
+    const hash256& boundary, uint64_t height) noexcept
 {
-    const hash512 seed = hash_seed(header_hash, nonce);
-    return is_less_or_equal(hash_final(seed, mix_hash), boundary);
+    const hash512 seed = hash_seed(header_hash, nonce, height);
+    return is_less_or_equal(hash_final(seed, mix_hash, height), boundary);
 }
 
 bool verify(const epoch_context& context, const hash256& header_hash, const hash256& mix_hash,
-    uint64_t nonce, const hash256& boundary) noexcept
+    uint64_t nonce, const hash256& boundary, uint64_t height) noexcept
 {
-    const hash512 seed = hash_seed(header_hash, nonce);
-    if (!is_less_or_equal(hash_final(seed, mix_hash), boundary))
+    const hash512 seed = hash_seed(header_hash, nonce, height);
+    if (!is_less_or_equal(hash_final(seed, mix_hash, height), boundary))
         return false;
 
     const hash256 expected_mix_hash = hash_kernel(context, seed, calculate_dataset_item_1024);
@@ -358,12 +366,12 @@ bool verify(const epoch_context& context, const hash256& header_hash, const hash
 }
 
 search_result search_light(const epoch_context& context, const hash256& header_hash,
-    const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept
+    const hash256& boundary, uint64_t start_nonce, size_t iterations, uint64_t height) noexcept
 {
     const uint64_t end_nonce = start_nonce + iterations;
     for (uint64_t nonce = start_nonce; nonce < end_nonce; ++nonce)
     {
-        result r = hash(context, header_hash, nonce);
+        result r = hash(context, header_hash, nonce, height);
         if (is_less_or_equal(r.final_hash, boundary))
             return {r, nonce};
     }
@@ -371,12 +379,12 @@ search_result search_light(const epoch_context& context, const hash256& header_h
 }
 
 search_result search(const epoch_context_full& context, const hash256& header_hash,
-    const hash256& boundary, uint64_t start_nonce, size_t iterations) noexcept
+    const hash256& boundary, uint64_t start_nonce, size_t iterations, uint64_t height) noexcept
 {
     const uint64_t end_nonce = start_nonce + iterations;
     for (uint64_t nonce = start_nonce; nonce < end_nonce; ++nonce)
     {
-        result r = hash(context, header_hash, nonce);
+        result r = hash(context, header_hash, nonce, height);
         if (is_less_or_equal(r.final_hash, boundary))
             return {r, nonce};
     }

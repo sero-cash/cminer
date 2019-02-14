@@ -36,7 +36,7 @@ struct Result
 class EthashAux
 {
 public:
-    static Result eval(int epoch, h256 const& _headerHash, uint64_t _nonce) noexcept;
+    static Result eval(int epoch, h256 const& _headerHash, uint64_t _nonce, uint64_t height) noexcept;
 };
 
 struct EpochContext
@@ -60,6 +60,7 @@ struct WorkPackage
     h256 boundary;
     h256 header;  ///< When h256() means "pause until notified a new work package is available".
     h256 seed;
+    uint64_t height=0;
 
     int epoch = -1;
     int block = -1;
