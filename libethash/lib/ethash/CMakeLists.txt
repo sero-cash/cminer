@@ -30,10 +30,26 @@ add_library(
     progpow.cpp
 )
 
-link_directories("${PROJECT_SOURCE_DIR}/../../go-czero-import/czero/lib")
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    set(CZERO_PATH "${PROJECT_SOURCE_DIR}/../../go-czero-import/czero/lib_LINUX_AMD64_V3")
+    set(CZERO_LIB "${CZERO_PATH}/libczero.so")
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+        message(ERROR "CZERO_PATH import error for Clang !!!")
+    else()
+        set(CZERO_PATH "${PROJECT_SOURCE_DIR}/../../go-czero-import/czero/lib_DARWIN_AMD64")
+        set(CZERO_LIB "${CZERO_PATH}/libczero.dylib")
+    endif()
+else ()
+    set(CZERO_PATH "${PROJECT_SOURCE_DIR}/../../go-czero-import/czero/lib_WINDOWS_AMD64")
+    set(CZERO_LIB "${CZERO_PATH}/libczero.dll.a")
+endif ()
+
+link_directories(${CZERO_PATH})
 
 target_include_directories(ethash PUBLIC $<BUILD_INTERFACE:${include_dir}>$<INSTALL_INTERFACE:include>)
-target_link_libraries(ethash "${PROJECT_SOURCE_DIR}/../../go-czero-import/czero/lib/libczero.dylib")
+target_link_libraries(ethash ${CZERO_LIB})
 
 write_basic_package_version_file(ethashConfigVersion.cmake COMPATIBILITY SameMajorVersion)
 
