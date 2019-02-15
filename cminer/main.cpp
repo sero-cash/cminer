@@ -359,9 +359,9 @@ public:
         bool cuda_miner = false;
         app.add_flag("-U,--cuda", cuda_miner, "");
 
-        bool cpu_miner = false;
+        unsigned cpu_miner = 0;
 #if ETH_ETHASHCPU
-        app.add_flag("--cpu", cpu_miner, "");
+        app.add_option("--cpu", cpu_miner, "");
 #endif
         auto sim_opt = app.add_option("-Z,--simulation,-M,--benchmark", m_PoolSettings.benchmarkBlock, "", true);
 
@@ -406,9 +406,10 @@ public:
             m_minerType = MinerType::CL;
         else if (cuda_miner)
             m_minerType = MinerType::CUDA;
-        else if (cpu_miner)
+        else if (cpu_miner>0) {
+            this->m_CPSettings.cpu_count = cpu_miner;
             m_minerType = MinerType::CPU;
-        else
+        } else
             m_minerType = MinerType::Mixed;
 
         /*
@@ -514,7 +515,7 @@ public:
 #endif
 #if ETH_ETHASHCPU
         if (m_minerType == MinerType::CPU)
-            CPUMiner::enumDevices(m_DevicesCollection);
+            CPUMiner::enumDevices(m_DevicesCollection,m_CPSettings.cpu_count);
 #endif
 
         // Can't proceed without any GPU
@@ -1174,7 +1175,7 @@ public:
                  << "    The special notation '-P exit' stops the failover loop." << endl
                  << "    When cminer reaches this kind of connection it simply quits." << endl
                  << endl
-                 << "    When using stratum mode cminer tries to auto-detect the correct" << endl
+                 << "    When using stratum mode miner tries to auto-detect the correct" << endl
                  << "    flavour provided by the pool. Should be fine in 99% of the cases." << endl
                  << "    Nevertheless you might want to fine tune the stratum flavour by" << endl
                  << "    any of of the following valid schemes :" << endl
