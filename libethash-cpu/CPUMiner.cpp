@@ -187,7 +187,7 @@ bool CPUMiner::initDevice()
     int err;
 
     CPU_ZERO(&cpuset);
-    CPU_SET(m_deviceDescriptor.cpCpuNumer, &cpuset);
+    CPU_SET(m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices(), &cpuset);
 
     err = sched_setaffinity(0, sizeof(cpuset), &cpuset);
     if (err != 0)
