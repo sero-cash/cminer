@@ -400,7 +400,7 @@ void PoolManager::rotateConnect()
         if (m_Settings.connections.size() == 1)
         {
             cnote << "beyond max retrys count wait 5 second ...";
-            sleep(5);
+            boost::this_thread::sleep(boost::posix_time::seconds(5));
             //m_Settings.connections.erase(m_Settings.connections.begin() + m_activeConnectionIdx);
         }
         // Rotate connections if above max attempts threshold
