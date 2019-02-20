@@ -399,7 +399,7 @@ void PoolManager::rotateConnect()
         // forever
         if (m_Settings.connections.size() == 1)
         {
-            cnote << "ablove max retrys count wait 5 second ...";
+            cnote << "beyond max retrys count wait 5 second ...";
             sleep(5);
             //m_Settings.connections.erase(m_Settings.connections.begin() + m_activeConnectionIdx);
         }
