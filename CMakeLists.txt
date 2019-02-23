@@ -20,7 +20,7 @@ HunterGate(
 )
 
 project(cminer)
-set(PROJECT_VERSION 0.1.0-alpha.1)
+set(PROJECT_VERSION 0.1.0-beta.1)
 
 cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Release RelWithDebInfo)
 
