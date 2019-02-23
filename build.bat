@@ -14,8 +14,6 @@ rem cd "%~dp0\cminer\"
 
 if not exist "build\" mkdir "build\"
 
-cd build
-
 rem For CUDA 9.x pass also `-T v140`
 cmake -G "Visual Studio 15 2017 Win64" -H. -Bbuild ..
 cmake --build . --config Release --target cminer
