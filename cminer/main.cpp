@@ -359,7 +359,7 @@ public:
         bool cuda_miner = false;
         app.add_flag("-U,--cuda", cuda_miner, "");
 
-        unsigned cpu_miner = 0;
+        int cpu_miner = -1;
 #if ETH_ETHASHCPU
         app.add_option("--cpu", cpu_miner, "");
 #endif
@@ -406,7 +406,7 @@ public:
             m_minerType = MinerType::CL;
         else if (cuda_miner)
             m_minerType = MinerType::CUDA;
-        else if (cpu_miner>0) {
+        else if (cpu_miner>=0) {
             this->m_CPSettings.cpu_count = cpu_miner;
             m_minerType = MinerType::CPU;
         } else

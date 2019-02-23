@@ -34,7 +34,7 @@ public:
     ~CPUMiner() override;
 
     static unsigned getNumDevices();
-    static void enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollection, unsigned count);
+    static void enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollection, int count);
 
     void search(const dev::eth::WorkPackage& w);
 

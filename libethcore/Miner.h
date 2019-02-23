@@ -115,7 +115,7 @@ struct CLSettings : public MinerSettings
 // Holds settings for CPU Miner
 struct CPSettings : public MinerSettings
 {
-    unsigned cpu_count=0;
+    int cpu_count=0;
 };
 
 struct SolutionAccountType

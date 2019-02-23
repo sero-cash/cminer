@@ -109,17 +109,8 @@ static size_t getTotalPhysAvailableMemory()
  */
 unsigned CPUMiner::getNumDevices()
 {
-#if 0
-    static unsigned cpus = 0;
-
-    if (cpus == 0)
-    {
-        std::vector< boost::fibers::numa::node > topo = boost::fibers::numa::topology();
-        for (auto n : topo) {
-            cpus += n.logical_cpus.size();
-        }
-    }
-    return cpus;
+#if 1
+    return thread::hardware_concurrency();
 #elif defined(__APPLE__) || defined(__MACOSX)
 //#error "TODO: Function CPUMiner::getNumDevices() on MAXOSX not implemented"
     u_int64_t count= 0;
@@ -198,7 +189,7 @@ bool CPUMiner::initDevice()
               << "\n";
     }
 #else
-    DWORD_PTR dwThreadAffinityMask = 1i64 << m_deviceDescriptor.cpCpuNumer;
+    DWORD_PTR dwThreadAffinityMask = 1i64 << (m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices());
     DWORD_PTR previous_mask;
     previous_mask = SetThreadAffinityMask(GetCurrentThread(), dwThreadAffinityMask);
     if (previous_mask == NULL)
@@ -337,10 +328,15 @@ void CPUMiner::workLoop()
 }
 
 
-void CPUMiner::enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollection, unsigned count)
+void CPUMiner::enumDevices(std::map<string, DeviceDescriptor>& _DevicesCollection, int count)
 {
-    //unsigned numDevices = getNumDevices();
-    unsigned numDevices = count;
+    unsigned cpu_count=getNumDevices();
+    unsigned numDevices =cpu_count-1;
+    if(count>0) {
+        numDevices = count;
+    }
+
+    cpulog << EthWhite << "CPU COUNT: " << cpu_count << ", SELECT: " << numDevices << EthReset;
 
     for (unsigned i = 0; i < numDevices; i++)
     {
