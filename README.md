@@ -122,5 +122,6 @@ to the configuration options.
 ## License
 
 This source is forked from https://github.com/ethereum-mining/ethminer
+
 Licensed under the [GNU General Public License, Version 3](LICENSE).
 
