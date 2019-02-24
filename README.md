@@ -1,6 +1,6 @@
 # cminer
 
-Now can only use CPU for mining.
+Now can only mine using CPU.
 
 ## Usage
 
