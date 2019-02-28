@@ -18,6 +18,7 @@ EthGetworkClient::EthGetworkClient(int worktimeout, unsigned farmRecheckPeriod)
     m_txQueue(1024),
     m_resolver(g_io_service),
     m_endpoints(),
+    m_getwork_check_timer(g_io_service),
     m_getwork_timer(g_io_service),
     m_worktimeout(worktimeout)
 {
@@ -46,6 +47,7 @@ void EthGetworkClient::connect()
 
     // Reset status flags
     m_getwork_timer.cancel();
+    m_getwork_check_timer.cancel();
     
     // Initialize a new queue of end points
     m_endpoints = std::queue<boost::asio::ip::basic_endpoint<boost::asio::ip::tcp>>();
@@ -86,6 +88,7 @@ void EthGetworkClient::disconnect()
     m_connecting.store(false, std::memory_order_relaxed);
     m_txPending.store(false, std::memory_order_relaxed);
     m_getwork_timer.cancel();
+    m_getwork_check_timer.cancel();
 
     m_txQueue.consume_all([](std::string* l) { delete l; });
     m_request.consume(m_request.capacity());
@@ -104,6 +107,11 @@ void EthGetworkClient::begin_connect()
         m_endpoint = m_endpoints.front();
         m_socket.async_connect(
             m_endpoint, m_io_strand.wrap(boost::bind(&EthGetworkClient::handle_connect, this, _1)));
+        m_getwork_check_timer.cancel();
+        m_getwork_check_timer.expires_from_now(boost::posix_time::seconds(2*60));
+        m_getwork_check_timer.async_wait(
+            m_io_strand.wrap(boost::bind(&EthGetworkClient::getwork_timer_check, this,
+                                         boost::asio::placeholders::error)));
     }
     else
     {
@@ -401,6 +409,7 @@ void EthGetworkClient::processResponse(Json::Value& JRes)
         {
             cwarn << "Got " << _errReason << " from " << m_conn->Host() << ":"
                   << toString(m_conn->Port());
+            m_getwork_check_timer.cancel();
             m_getwork_timer.expires_from_now(boost::posix_time::seconds(30));
             m_getwork_timer.async_wait(
                 m_io_strand.wrap(boost::bind(&EthGetworkClient::getwork_timer_elapsed, this,
@@ -432,6 +441,7 @@ void EthGetworkClient::processResponse(Json::Value& JRes)
                     if (m_onWorkReceived)
                         m_onWorkReceived(m_current);
                 }
+                m_getwork_check_timer.cancel();
                 m_getwork_timer.expires_from_now(boost::posix_time::milliseconds(m_farmRecheckPeriod));
                 m_getwork_timer.async_wait(
                     m_io_strand.wrap(boost::bind(&EthGetworkClient::getwork_timer_elapsed, this,
@@ -558,7 +568,14 @@ void EthGetworkClient::submitSolution(const Solution& solution)
 
 }
 
-void EthGetworkClient::getwork_timer_elapsed(const boost::system::error_code& ec) 
+void EthGetworkClient::getwork_timer_check(const boost::system::error_code& ec) {
+    if(!ec) {
+        clog << "CHECK GETWORK PROCESSING: " << ec << "\n";
+        disconnect();
+    }
+}
+
+void EthGetworkClient::getwork_timer_elapsed(const boost::system::error_code& ec)
 {
     // Triggers the resubmission of a getWork request
     if (!ec)

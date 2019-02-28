@@ -42,6 +42,7 @@ private:
     void send(Json::Value const& jReq);
     void send(std::string const& sReq);
     void getwork_timer_elapsed(const boost::system::error_code& ec);
+    void getwork_timer_check(const boost::system::error_code& ec);
 
     WorkPackage m_current;
 
@@ -62,6 +63,7 @@ private:
     Json::Value m_pendingJReq;
     std::chrono::time_point<std::chrono::steady_clock> m_pending_tstamp;
 
+    boost::asio::deadline_timer m_getwork_check_timer;  // The timer which triggers getWork check
     boost::asio::deadline_timer m_getwork_timer;  // The timer which triggers getWork requests
 
     // seconds to trigger a work_timeout (overwritten in constructor)
