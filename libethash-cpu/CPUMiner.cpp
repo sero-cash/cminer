@@ -189,15 +189,14 @@ bool CPUMiner::initDevice()
               << "\n";
     }
 #else
-    DWORD_PTR dwThreadAffinityMask = 1i64 << (m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices());
+    /*DWORD_PTR dwThreadAffinityMask = 1i64 << (m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices());
     DWORD_PTR previous_mask;
     previous_mask = SetThreadAffinityMask(GetCurrentThread(), dwThreadAffinityMask);
     if (previous_mask == NULL)
     {
         cwarn << "cp-" << m_index << "could not bind thread to cpu" << m_deviceDescriptor.cpCpuNumer
               << "\n";
-        // Handle Errorcode (GetLastError) ??
-    }
+    }*/
 #endif
     DEV_BUILD_LOG_PROGRAMFLOW(cpulog, "cp-" << m_index << " CPUMiner::initDevice end");
     return true;
