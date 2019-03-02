@@ -171,6 +171,9 @@ bool CPUMiner::initDevice()
     cpulog << "Using CPU: " << m_deviceDescriptor.cpCpuNumer << " " << m_deviceDescriptor.cuName
            << " Memory : " << dev::getFormattedMemory((double)m_deviceDescriptor.totalMemory);
 
+    uint64_t cpu_num=m_deviceDescriptor.cpCpuNumer;
+    uint64_t processor_num=cpu_num%CPUMiner::getNumDevices();
+
 #if defined(__APPLE__) || defined(__MACOSX)
 //#error "TODO: Function CPUMiner::initDevice() on MAXOSX not implemented"
 #elif defined(__linux__)
@@ -178,7 +181,7 @@ bool CPUMiner::initDevice()
     int err;
 
     CPU_ZERO(&cpuset);
-    CPU_SET(m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices(), &cpuset);
+    CPU_SET(processor_num, &cpuset);
 
     err = sched_setaffinity(0, sizeof(cpuset), &cpuset);
     if (err != 0)
@@ -189,7 +192,7 @@ bool CPUMiner::initDevice()
               << "\n";
     }
 #else
-    DWORD_PTR dwThreadAffinityMask = 1i64 << (m_deviceDescriptor.cpCpuNumer%CPUMiner::getNumDevices());
+    DWORD_PTR dwThreadAffinityMask = 1i64 << (processor_num);
     DWORD_PTR previous_mask;
     previous_mask = SetThreadAffinityMask(GetCurrentThread(), dwThreadAffinityMask);
     if (previous_mask == NULL)
@@ -198,6 +201,7 @@ bool CPUMiner::initDevice()
               << "\n";
     }
 #endif
+    cpulog << "Map CPU-" << cpu_num << " to Processor-" << processor_num << " END";
     DEV_BUILD_LOG_PROGRAMFLOW(cpulog, "cp-" << m_index << " CPUMiner::initDevice end");
     return true;
 }
