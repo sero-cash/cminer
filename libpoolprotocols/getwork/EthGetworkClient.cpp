@@ -79,6 +79,10 @@ void EthGetworkClient::connect()
 void EthGetworkClient::disconnect()
 {
     // Release session
+    if(m_socket.is_open()) {
+        m_socket.cancel();
+        m_socket.close();
+    }
     m_connected.store(false, memory_order_relaxed);
     if(m_session) {
         m_conn->addDuration(m_session->duration());

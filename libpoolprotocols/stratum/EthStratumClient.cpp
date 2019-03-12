@@ -1342,15 +1342,20 @@ void EthStratumClient::processResponse(Json::Value& responseObject)
                     // namely ethermine.org
                     m_current.block = -1;
                     if (m_conn->StratumMode() == EthStratumClient::ETHPROXY &&
-                        jPrm.size() > prmIdx &&
-                        jPrm.get(Json::Value::ArrayIndex(prmIdx), "").asString().substr(0, 2) ==
-                            "0x")
+                        jPrm.size() > prmIdx)
                     {
                         try
                         {
-                            m_current.block =
-                                std::stoul(jPrm.get(Json::Value::ArrayIndex(prmIdx), "").asString(),
-                                    nullptr, 16);
+                            if(jPrm.get(Json::Value::ArrayIndex(prmIdx), "").asString().substr(0, 2) == "0x") {
+                                m_current.block =
+                                    std::stoul(jPrm.get(Json::Value::ArrayIndex(prmIdx), "").asString(),
+                                               nullptr, 16);
+                            } else {
+                                m_current.block =
+                                    std::stoul(jPrm.get(Json::Value::ArrayIndex(prmIdx), "").asString(),
+                                               nullptr, 10);
+                            }
+                            m_current.height=m_current.block;
                             /*
                             check if the block number is in a valid range
                             A year has ~31536000 seconds
