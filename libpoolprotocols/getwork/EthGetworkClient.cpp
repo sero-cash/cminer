@@ -436,6 +436,7 @@ void EthGetworkClient::processResponse(Json::Value& JRes)
                 newWp.boundary = h256(JPrm.get(Json::Value::ArrayIndex(2), "").asString());
                 auto height=JPrm.get(Json::Value::ArrayIndex(3),"").asString();
                 newWp.height=atoi(height.c_str());
+                newWp.block=newWp.height;
                 newWp.job = newWp.header.hex();
                 if (m_current.header != newWp.header)
                 {
