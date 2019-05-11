@@ -265,11 +265,15 @@ inline hash512 hash_seed(const hash256& header_hash, uint64_t nonce, uint64_t he
 
     //return keccak512(init_data, sizeof(init_data));
     hash512 ret={0};
-    if(height<130000) {
-        zero_hash_0(init_data, ret.bytes);
+
+    if(height>=0) {
+        zero_hash_2_enter(init_data, ret.bytes);
+    } else if(height >=130000) {
+        zero_hash_1_enter(init_data, ret.bytes);
     } else {
-        zero_hash_2(init_data, ret.bytes);
+        zero_hash_0_enter(init_data, ret.bytes);
     }
+
     return ret;
 }
 
@@ -281,11 +285,15 @@ inline hash256 hash_final(const hash512& seed, const hash256& mix_hash, uint64_t
     //return keccak256(final_data, sizeof(final_data));
 
     hash256 ret={0};
-    if(height<130000) {
-        zero_hash_1(final_data, ret.bytes);
+
+    if(height>=0) {
+        zero_hash_2_leave(final_data, ret.bytes);
+    } else if(height >=130000) {
+        zero_hash_1_leave(final_data, ret.bytes);
     } else {
-        zero_hash_3(final_data, ret.bytes);
+        zero_hash_0_leave(final_data, ret.bytes);
     }
+
     return ret;
 }
 
