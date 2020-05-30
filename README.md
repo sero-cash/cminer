@@ -1,7 +1,3 @@
-# cminer
-
-Now can only mine using CPU.
-
 ## Usage
 
 The **cminer** is a command line program. This means you launch it
